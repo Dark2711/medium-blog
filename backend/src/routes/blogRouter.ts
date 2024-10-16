@@ -1,22 +1,20 @@
 import { Hono } from 'hono';
-
+import auth from '../middlewares/auth';
+import { createBlog, fetchAllBlogs, getBlog, updateBlog } from '../controllers/blog.controller';
 const blogRouter = new Hono();
 
-blogRouter.post('/blog', (c) => {
-  return c.json({ message: 'Post blog route' });
-});
+blogRouter.use('/blog', auth);
 
-blogRouter.put('/blog', (c) => {
-  return c.json({ message: 'Put blog route' });
-});
+// create blog
+blogRouter.post('/blog', createBlog);
 
-blogRouter.get('/blog/bulk', (c) => {
-  return c.json({ message: 'get all the blogs' });
-});
-blogRouter.get('/blog/:id', (c) => {
-  const id = c.req.param('id');
-  console.log(id);
-  return c.text('get specific blog route');
-});
+//update blog
+blogRouter.put('/blog', updateBlog);
+
+// get all the blogs
+blogRouter.get('/blog/bulk', fetchAllBlogs);
+
+// get blog by id in param
+blogRouter.get('/blog/:id', getBlog);
 
 export default blogRouter;
