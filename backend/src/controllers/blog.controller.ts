@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
 import { Context } from 'hono';
+import { createPostInput, updatePostInput } from '@dark2711/common';
 
 export async function createBlog(c: Context) {
   const userID = c.get('userID');
@@ -16,6 +17,11 @@ export async function createBlog(c: Context) {
   console.log(user);
 
   const body = await c.req.json();
+  const { success } = createPostInput.safeParse(body);
+  if (!success) {
+    c.status(411);
+    return c.json({ message: 'Invalid Inputs' });
+  }
   try {
     const post = await prisma.post.create({
       data: {
@@ -40,6 +46,11 @@ export async function updateBlog(c: Context) {
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
+  const { success } = updatePostInput.safeParse(body);
+  if (!success) {
+    c.status(411);
+    return c.json({ message: 'Invalid Inputs' });
+  }
   const post = await prisma.post.findUnique({
     where: {
       id: body.id,
